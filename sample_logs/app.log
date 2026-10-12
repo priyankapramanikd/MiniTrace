@@ -1,0 +1,8 @@
+2026-10-12 09:00:01 INFO Application started
+2026-10-12 09:00:05 INFO Database connected
+2026-10-12 09:01:10 WARNING High memory usage detected
+2026-10-12 09:02:15 ERROR Database connection failed
+2026-10-12 09:02:20 ERROR Request processing failed
+2026-10-12 09:03:00 INFO Retry attempt started
+2026-10-12 09:03:30 WARNING API response is slow
+2026-10-12 09:04:00 ERROR Service unavailable

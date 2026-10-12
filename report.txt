@@ -1,0 +1,10 @@
+===== MiniTrace Log Report =====
+Total log entries: 8
+INFO: 3
+WARNING: 2
+ERROR: 3
+
+===== Error Details =====
+2026-10-12 09:02:15 ERROR Database connection failed
+2026-10-12 09:02:20 ERROR Request processing failed
+2026-10-12 09:04:00 ERROR Service unavailable
