@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniTrace | Log Monitoring Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f3f6fc;
+            color: #17233c;
+        }
+
+        header {
+            background: #101b35;
+            color: white;
+            padding: 25px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        header h1 {
+            font-size: 26px;
+            letter-spacing: 0.5px;
+        }
+
+        header p {
+            color: #b9c6e3;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .status {
+            background: #173f3b;
+            color: #8df0c3;
+            padding: 9px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 0 22px;
+        }
+
+        .intro {
+            margin-bottom: 25px;
+        }
+
+        .intro h2 {
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .intro p {
+            color: #68758d;
+            line-height: 1.6;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 23px;
+            border-radius: 16px;
+            border: 1px solid #e5eaf3;
+            box-shadow: 0 7px 22px #17233c08;
+        }
+
+        .card-label {
+            color: #68758d;
+            font-size: 14px;
+        }
+
+        .card-number {
+            font-size: 35px;
+            font-weight: 700;
+            margin-top: 14px;
+        }
+
+        .total { border-top: 4px solid #657cf0; }
+        .info { border-top: 4px solid #18a978; }
+        .warning { border-top: 4px solid #edaa36; }
+        .error { border-top: 4px solid #e45161; }
+
+        .panel {
+            background: white;
+            border: 1px solid #e5eaf3;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 7px 22px #17233c08;
+            margin-bottom: 25px;
+        }
+
+        .panel h3 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .panel-subtitle {
+            color: #78849a;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .log {
+            padding: 15px;
+            margin-top: 10px;
+            background: #f7f9fd;
+            border-radius: 9px;
+            border-left: 4px solid #c5cede;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+            line-height: 1.6;
+        }
+
+        .log.INFO { border-left-color: #18a978; }
+        .log.WARNING { border-left-color: #edaa36; }
+        .log.ERROR { border-left-color: #e45161; }
+
+        .tag {
+            display: inline-block;
+            font-weight: 700;
+            margin-right: 8px;
+            font-size: 11px;
+        }
+
+        .tag.INFO { color: #13845e; }
+        .tag.WARNING { color: #b77912; }
+        .tag.ERROR { color: #d83c4c; }
+
+        footer {
+            text-align: center;
+            color: #78849a;
+            font-size: 13px;
+            padding: 25px;
+        }
+
+        @media (max-width: 750px) {
+            .cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            header h1 { font-size: 22px; }
+            .intro h2 { font-size: 23px; }
+        }
+
+        @media (max-width: 420px) {
+            .cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>MiniTrace<span style="color:#8fa5ff">.</span></h1>
+            <p>Application Log Monitoring & Analysis</p>
+        </div>
+        <div class="status">● Dashboard Online</div>
+    </header>
+
+    <main>
+        <section class="intro">
+            <h2>System Overview</h2>
+            <p>Monitor application events, review log severity, and identify errors from one dashboard.</p>
+        </section>
+
+        <section class="cards">
+            <div class="card total">
+                <div class="card-label">Total Log Entries</div>
+                <div class="card-number">{{ total }}</div>
+            </div>
+
+            <div class="card info">
+                <div class="card-label">Information</div>
+                <div class="card-number">{{ summary["INFO"] }}</div>
+            </div>
+
+            <div class="card warning">
+                <div class="card-label">Warnings</div>
+                <div class="card-number">{{ summary["WARNING"] }}</div>
+            </div>
+
+            <div class="card error">
+                <div class="card-label">Errors Detected</div>
+                <div class="card-number">{{ summary["ERROR"] }}</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h3>Recent Log Activity</h3>
+            <p class="panel-subtitle">Entries loaded from your application log file</p>
+
+            {% for entry in logs %}
+                {% set level = namespace(value="INFO") %}
+                {% if "ERROR" in entry %}
+                    {% set level.value = "ERROR" %}
+                {% elif "WARNING" in entry %}
+                    {% set level.value = "WARNING" %}
+                {% endif %}
+
+                <div class="log {{ level.value }}">
+                    <span class="tag {{ level.value }}">{{ level.value }}</span>
+                    {{ entry }}
+                </div>
+            {% else %}
+                <p>No log entries found.</p>
+            {% endfor %}
+        </section>
+    </main>
+
+    <footer>
+        MiniTrace · Python + Flask · Local Log Analysis
+    </footer>
+</body>
+</html>
